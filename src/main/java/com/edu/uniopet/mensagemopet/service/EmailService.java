@@ -4,23 +4,34 @@ import com.edu.uniopet.mensagemopet.model.Email;
 import com.edu.uniopet.mensagemopet.repository.EmailRepository;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Date;
 import java.util.List;
 
 @Service
 public class EmailService {
 
+    @Resource
     private EmailRepository emailRepository;
 
-    public List<Email> findAll() {return emailRepository.findAll();}
+    public List<Email> listAll() {return emailRepository.findAll();}
 
     public Email findById(Long id) {return  emailRepository.findById(id).get();}
 
-    public String saveOrUpdate (Email email){
-        if (emailRepository.save(email) != null){
-            return "deu boa";
+    public Email send(Email email){
+        InetAddress inetAddress;
+        try {
+            inetAddress = InetAddress.getLocalHost();
+            email.setOrigem(inetAddress.toString());
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
         }
 
-        return "problemas";
+        email.setData(new Date());
+
+        return emailRepository.save(email);
     }
 
     public void delete(Email email){
